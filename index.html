@@ -1117,7 +1117,7 @@ a {
           <p>Открыты к диалогу с предпринимателями, инвесторами, поставщиками и командами, которые хотят строить компании нового поколения.</p>
         </div>
         <address>
-          <a href="mailto:hello@miracorp.co">hello@miracorp.co</a>
+          <a href="mailto:info@miracorp.co">info@miracorp.co</a>
           <a href="https://miracorp.co/">miracorp.co</a>
         </address>
       </section>
@@ -1129,6 +1129,22 @@ a {
     </footer>
     <script>
       if (window.parent !== window) {
+        document.querySelectorAll('a[href^="#"]').forEach((link) => {
+          link.addEventListener("click", (event) => {
+            const target = document.querySelector(link.getAttribute("href"));
+            if (!target) return;
+
+            event.preventDefault();
+            window.parent.postMessage(
+              {
+                type: "mira-corp-scroll",
+                top: target.getBoundingClientRect().top + window.scrollY,
+              },
+              "*"
+            );
+          });
+        });
+
         const postHeight = () => {
           window.parent.postMessage(
             { type: "mira-corp-height", height: document.documentElement.scrollHeight },
