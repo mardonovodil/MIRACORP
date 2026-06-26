@@ -965,7 +965,7 @@ a {
             <path d="M3 12h18M12 3a15.5 15.5 0 0 1 0 18M12 3a15.5 15.5 0 0 0 0 18M4 7h16M4 17h16"></path>
             <circle cx="12" cy="12" r="9"></circle>
           </svg>
-          <span>RU</span>
+          <span>EN</span>
         </summary>
         <div class="language-menu" aria-label="Доступные языки">
           <a href="index.html" lang="ru">RU <span>Русский</span></a>
@@ -1039,7 +1039,7 @@ a {
           <p>О компании</p>
         </div>
         <div class="about-content">
-          <h2>About MIRA CORP</h2>
+          <h2>About the Company</h2>
           <p>A holding platform for building strong companies with long-term potential.</p>
         </div>
         <figure class="about-visual">
@@ -1128,8 +1128,23 @@ a {
     </footer>
     <script>
       if (window.parent !== window) {
+        document.querySelectorAll(".language-menu a[lang='ru'], .language-menu a[lang='en']").forEach((link) => {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            window.parent.postMessage(
+              {
+                type: "mira-corp-language",
+                lang: link.lang,
+                path: link.lang === "en" ? "en.html" : "index.html",
+              },
+              "*"
+            );
+          });
+        });
+
         document.querySelectorAll('a[href^="#"]').forEach((link) => {
           link.addEventListener("click", (event) => {
+            if (link.closest(".language-menu")) return;
             const target = document.querySelector(link.getAttribute("href"));
             if (!target) return;
 
@@ -1145,8 +1160,13 @@ a {
         });
 
         const postHeight = () => {
+          const footer = document.querySelector(".site-footer");
+          const height = footer
+            ? Math.ceil(footer.getBoundingClientRect().bottom + window.scrollY)
+            : document.documentElement.scrollHeight;
+
           window.parent.postMessage(
-            { type: "mira-corp-height", height: document.documentElement.scrollHeight },
+            { type: "mira-corp-height", height },
             "*"
           );
         };

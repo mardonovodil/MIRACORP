@@ -1129,8 +1129,23 @@ a {
     </footer>
     <script>
       if (window.parent !== window) {
+        document.querySelectorAll(".language-menu a[lang='ru'], .language-menu a[lang='en']").forEach((link) => {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            window.parent.postMessage(
+              {
+                type: "mira-corp-language",
+                lang: link.lang,
+                path: link.lang === "en" ? "en.html" : "index.html",
+              },
+              "*"
+            );
+          });
+        });
+
         document.querySelectorAll('a[href^="#"]').forEach((link) => {
           link.addEventListener("click", (event) => {
+            if (link.closest(".language-menu")) return;
             const target = document.querySelector(link.getAttribute("href"));
             if (!target) return;
 
@@ -1146,8 +1161,13 @@ a {
         });
 
         const postHeight = () => {
+          const footer = document.querySelector(".site-footer");
+          const height = footer
+            ? Math.ceil(footer.getBoundingClientRect().bottom + window.scrollY)
+            : document.documentElement.scrollHeight;
+
           window.parent.postMessage(
-            { type: "mira-corp-height", height: document.documentElement.scrollHeight },
+            { type: "mira-corp-height", height },
             "*"
           );
         };
