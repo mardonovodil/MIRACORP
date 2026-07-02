@@ -1,0 +1,5 @@
+.env
+node_modules/
+naturello-crm-api/.env
+naturello-crm-api/node_modules/
+
