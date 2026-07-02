@@ -2,7 +2,9 @@ import email
 import imaplib
 import json
 import os
+import socket
 import smtplib
+from contextlib import contextmanager
 from email.message import EmailMessage
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs, urlparse
@@ -78,9 +80,26 @@ def require_credentials():
         raise RuntimeError("YANDEX360_PASSWORD is not configured")
 
 
+@contextmanager
+def prefer_ipv4():
+    original_getaddrinfo = socket.getaddrinfo
+
+    def getaddrinfo_ipv4(host, port, family=0, type=0, proto=0, flags=0):
+        if family == 0:
+            family = socket.AF_INET
+        return original_getaddrinfo(host, port, family, type, proto, flags)
+
+    socket.getaddrinfo = getaddrinfo_ipv4
+    try:
+        yield
+    finally:
+        socket.getaddrinfo = original_getaddrinfo
+
+
 def smtp_login():
     require_credentials()
-    smtp = smtplib.SMTP_SSL(CONFIG["smtp_host"], CONFIG["smtp_port"], timeout=20)
+    with prefer_ipv4():
+        smtp = smtplib.SMTP_SSL(CONFIG["smtp_host"], CONFIG["smtp_port"], timeout=20)
     smtp.login(CONFIG["email"], CONFIG["password"])
     return smtp
 
@@ -144,7 +163,8 @@ class Handler(BaseHTTPRequestHandler):
                 require_credentials()
                 query = parse_qs(parsed.query)
                 limit = min(int(query.get("limit", ["10"])[0]), 25)
-                imap = imaplib.IMAP4_SSL(CONFIG["imap_host"], CONFIG["imap_port"])
+                with prefer_ipv4():
+                    imap = imaplib.IMAP4_SSL(CONFIG["imap_host"], CONFIG["imap_port"])
                 imap.login(CONFIG["email"], CONFIG["password"])
                 imap.select("INBOX")
                 status, data = imap.search(None, "ALL")
