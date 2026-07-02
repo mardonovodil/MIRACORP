@@ -98,10 +98,28 @@ def prefer_ipv4():
 
 def smtp_login():
     require_credentials()
-    with prefer_ipv4():
-        smtp = smtplib.SMTP_SSL(CONFIG["smtp_host"], CONFIG["smtp_port"], timeout=20)
-    smtp.login(CONFIG["email"], CONFIG["password"])
-    return smtp
+    ports = [CONFIG["smtp_port"]]
+    for fallback_port in (587, 465):
+        if fallback_port not in ports:
+            ports.append(fallback_port)
+
+    last_error = None
+    for port in ports:
+        try:
+            with prefer_ipv4():
+                if port == 465:
+                    smtp = smtplib.SMTP_SSL(CONFIG["smtp_host"], port, timeout=12)
+                else:
+                    smtp = smtplib.SMTP(CONFIG["smtp_host"], port, timeout=12)
+                    smtp.ehlo()
+                    smtp.starttls()
+                    smtp.ehlo()
+            smtp.login(CONFIG["email"], CONFIG["password"])
+            return smtp
+        except Exception as error:
+            last_error = error
+
+    raise last_error
 
 
 def validate_email_payload(payload):
