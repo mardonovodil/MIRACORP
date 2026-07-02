@@ -1,0 +1,40 @@
+name: Build NATURELLO API image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "naturello-crm-api/**"
+      - ".github/workflows/build-yandex-image.yml"
+
+env:
+  CR_REGISTRY: crpmr839d33g8ijc494r
+  CR_REPOSITORY: naturello-crm-api
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Yandex Cloud Container Registry
+        uses: yc-actions/yc-cr-login@v3
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+      - name: Build image
+        run: |
+          docker build \
+            -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:latest \
+            -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:${{ github.sha }} \
+            naturello-crm-api
+
+      - name: Push image
+        run: |
+          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:latest
+          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:${{ github.sha }}
+

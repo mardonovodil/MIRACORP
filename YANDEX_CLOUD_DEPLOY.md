@@ -37,15 +37,57 @@ naturello-crm
 
 ## Step 3: Build and Push Docker Image
 
+Recommended path for this project: GitHub Actions.
+
+1. In Yandex Cloud, create a service account for GitHub:
+
+```text
+github-cr-pusher
+```
+
+2. Give it the role:
+
+```text
+container-registry.images.pusher
+```
+
+3. Create an authorized key for this service account and download/copy the JSON.
+4. In GitHub repository settings, open:
+
+```text
+Settings -> Secrets and variables -> Actions -> New repository secret
+```
+
+5. Add secret:
+
+```text
+Name: YC_SA_JSON_CREDENTIALS
+Value: <full authorized key JSON>
+```
+
+Do not paste this key into chat.
+
+6. Open GitHub Actions and run:
+
+```text
+Build NATURELLO API image
+```
+
+It will push the image to:
+
+```text
+cr.yandex/crpmr839d33g8ijc494r/naturello-crm-api:latest
+```
+
+Manual local path, only if Docker and Yandex Cloud CLI are installed:
+
 From the project root:
 
 ```bash
 cd naturello-crm-api
-docker build -t cr.yandex/<registry-id>/naturello-crm-api:latest .
-docker push cr.yandex/<registry-id>/naturello-crm-api:latest
+docker build -t cr.yandex/crpmr839d33g8ijc494r/naturello-crm-api:latest .
+docker push cr.yandex/crpmr839d33g8ijc494r/naturello-crm-api:latest
 ```
-
-Replace `<registry-id>` with the Container Registry ID from Yandex Cloud.
 
 ## Step 4: Create Serverless Container
 
@@ -59,7 +101,7 @@ naturello-crm-api
 3. Create a revision from the image:
 
 ```text
-cr.yandex/<registry-id>/naturello-crm-api:latest
+cr.yandex/crpmr839d33g8ijc494r/naturello-crm-api:latest
 ```
 
 4. Runtime mode: **HTTP server**.
@@ -126,4 +168,3 @@ Check Yandex 360
 - Start with `DAILY_SEND_LIMIT=25`.
 - Keep SPF, DKIM, and DMARC configured for `naturello.food`.
 - During MVP testing, keep manual approval before every send.
-
