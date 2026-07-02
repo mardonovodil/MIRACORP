@@ -611,7 +611,7 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script>
       const STORAGE_KEY = "naturello-sales-crm-v1";
-      const API_BASE = localStorage.getItem("naturello-crm-api-base") || "http://localhost:8787";
+      const API_BASE = localStorage.getItem("naturello-crm-api-base") || "https://naturello-crm-api.onrender.com";
       const STAGES = ["New", "Qualified", "Contacted", "Replied", "Meeting", "Proposal", "Won", "Lost"];
       const probabilities = {
         New: 0.08,
