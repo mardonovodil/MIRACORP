@@ -18,15 +18,3 @@ Paste this into one Tilda `T123 HTML` block:
 ```
 
 After this, update files in GitHub and the Tilda page will load the newest published version.
-
-## Sales AI Manager
-
-Prototype CRM screen: `sales-ai-manager.html`
-
-Product and technical brief: `sales-ai-manager.md`
-
-Yandex 360 backend connector: `naturello-crm-api`
-
-GitHub and online deployment notes: `GITHUB_CRM_SETUP.md`
-
-Yandex Cloud deployment notes: `YANDEX_CLOUD_DEPLOY.md`
